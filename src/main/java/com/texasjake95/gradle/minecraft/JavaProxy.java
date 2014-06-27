@@ -1,8 +1,5 @@
 package com.texasjake95.gradle.minecraft;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -13,6 +10,7 @@ import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskCollection;
 import org.gradle.api.tasks.bundling.Jar;
 
+import net.minecraftforge.gradle.tasks.user.SourceCopyTask;
 import net.minecraftforge.gradle.user.patch.UserPatchExtension;
 
 import com.texasjake95.gradle.ProjectHelper;
@@ -62,23 +60,27 @@ public class JavaProxy {
 	
 	private static void addJarTasks(Project project)
 	{
+		System.out.println("Attempt 7");
+		SourceCopyTask task = (SourceCopyTask) project.getTasks().getByName("sourceMainJava");
+		task.replace("${version}", project.property("mod_version").toString() + "." + project.property("buildNumber").toString());
 		JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");
-		Map<String, String> prop = new HashMap<String, String>();
-		prop.put("version", project.property("mod_version").toString() + project.property("buildNumber").toString());
 		//
 		Jar jar = ProjectHelper.addTask(project, "devJar", Jar.class);
 		jar.setClassifier("dev");
 		jar.from(javaConv.getSourceSets().getByName("main").getOutput());
-		jar.from(javaConv.getSourceSets().getByName("main").getJava());
+		jar.from(task.getOutput());
 		project.getArtifacts().add("archives", jar);
 		project.getTasks().getByName("build").dependsOn(jar.getName());
 		//
 		jar = ProjectHelper.addTask(project, "apiJar", Jar.class);
 		jar.setClassifier("api");
 		jar.from(javaConv.getSourceSets().getByName("main").getOutput()).include("com/texasjake95/*/api/**");
-		jar.from(javaConv.getSourceSets().getByName("main").getJava()).include("com/texasjake95/*/api/**");
+		jar.from(task.getOutput()).include("com/texasjake95/*/api/**");
 		project.getArtifacts().add("archives", jar);
 		project.getTasks().getByName("build").dependsOn(jar.getName());
+		//
+		jar = (Jar) project.getTasks().getByName("sourceJar");
+		jar.from(task.getOutput());
 	}
 	
 	private static void configureRunTasks(Project project)
