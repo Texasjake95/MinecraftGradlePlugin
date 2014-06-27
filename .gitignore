@@ -1,0 +1,20 @@
+## gradle
+/.gradle
+/.groovy
+/build
+/bin
+
+## python dev - why IDK
+.pydevproject
+
+## eclipse
+.classpath
+.project
+/.settings
+.settings
+
+*.class
+
+# Package Files #
+*.war
+*.ear
