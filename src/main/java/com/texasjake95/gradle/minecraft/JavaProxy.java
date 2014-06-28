@@ -23,7 +23,7 @@ public class JavaProxy {
 	{
 		final Delete resetModFolder = ProjectHelper.addTask(project, "resetModFolder", Delete.class);
 		resetModFolder.delete(project.getProjectDir().getAbsolutePath() + "/mods/");
-		setupResetModFolder(project, resetModFolder);
+		addRequiredDeps(project, resetModFolder);
 		final SetATs setATs = ProjectHelper.addTask(project, "setATs", SetATs.class);
 		project.getExtensions().create("atSetup", ExtensionATExtract.class);
 		project.getExtensions().create("modSetup", ExtensionModSetup.class);
@@ -59,7 +59,7 @@ public class JavaProxy {
 		project.getTasks().getByName("extractUserDev").dependsOn(setATs.getName());
 	}
 	
-	private static void setupResetModFolder(Project project, Delete resetModFolder)
+	private static void addRequiredDeps(Project project, Task resetModFolder)
 	{
 		Task task = project.getTasks().getByName("setupDecompWorkspace");
 		task.dependsOn(resetModFolder.getName());
@@ -150,24 +150,13 @@ public class JavaProxy {
 	private static void addModFolder(Project project, Delete resetModFolder)
 	{
 		Copy modFolder;
-		if ((modFolder = (Copy) project.getTasks().getByName("setupModFolder")) != null)
+		if ((modFolder = (Copy) project.getTasks().getByName("setupModFolder")) == null)
 			modFolder = ProjectHelper.addTask(project, "setupModFolder", Copy.class);
 		for (ModFolderData mod : ((ExtensionModSetup) project.getExtensions().getByName("modSetup")).getData())
 			modFolder.from(mod.getMod());
 		modFolder.into(project.getProjectDir().getAbsolutePath() + "/mods/");
 		modFolder.dependsOn(resetModFolder.getName());
-		Task task = project.getTasks().getByName("setupDecompWorkspace");
-		task.dependsOn(modFolder.getName());
-		task = project.getTasks().getByName("setupDevWorkspace");
-		task.dependsOn(modFolder.getName());
-		task = project.getTasks().getByName("runClient");
-		task.dependsOn(modFolder.getName());
-		task = project.getTasks().getByName("debugClient");
-		task.dependsOn(modFolder.getName());
-		task = project.getTasks().getByName("runServer");
-		task.dependsOn(modFolder.getName());
-		task = project.getTasks().getByName("debugServer");
-		task.dependsOn(modFolder.getName());
+		addRequiredDeps(project, modFolder);
 	}
 	
 	private static boolean checkModFolder(ExtensionModSetup modSetup)
