@@ -23,6 +23,7 @@ public class JavaProxy {
 	{
 		final Delete resetModFolder = ProjectHelper.addTask(project, "resetModFolder", Delete.class);
 		resetModFolder.delete(project.getProjectDir().getAbsolutePath() + "/mods/");
+		setupResetModFolder(project, resetModFolder);
 		final SetATs setATs = ProjectHelper.addTask(project, "setATs", SetATs.class);
 		project.getExtensions().create("atSetup", ExtensionATExtract.class);
 		project.getExtensions().create("modSetup", ExtensionModSetup.class);
@@ -56,6 +57,22 @@ public class JavaProxy {
 			}
 		});
 		project.getTasks().getByName("extractUserDev").dependsOn(setATs.getName());
+	}
+	
+	private static void setupResetModFolder(Project project, Delete resetModFolder)
+	{
+		Task task = project.getTasks().getByName("setupDecompWorkspace");
+		task.dependsOn(resetModFolder.getName());
+		task = project.getTasks().getByName("setupDevWorkspace");
+		task.dependsOn(resetModFolder.getName());
+		task = project.getTasks().getByName("runClient");
+		task.dependsOn(resetModFolder.getName());
+		task = project.getTasks().getByName("debugClient");
+		task.dependsOn(resetModFolder.getName());
+		task = project.getTasks().getByName("runServer");
+		task.dependsOn(resetModFolder.getName());
+		task = project.getTasks().getByName("debugServer");
+		task.dependsOn(resetModFolder.getName());
 	}
 	
 	private static void addJarTasks(Project project)
@@ -132,7 +149,9 @@ public class JavaProxy {
 	
 	private static void addModFolder(Project project, Delete resetModFolder)
 	{
-		Copy modFolder = ProjectHelper.addTask(project, "setupModFolder", Copy.class);
+		Copy modFolder;
+		if ((modFolder = (Copy) project.getTasks().getByName("setupModFolder")) != null)
+			modFolder = ProjectHelper.addTask(project, "setupModFolder", Copy.class);
 		for (ModFolderData mod : ((ExtensionModSetup) project.getExtensions().getByName("modSetup")).getData())
 			modFolder.from(mod.getMod());
 		modFolder.into(project.getProjectDir().getAbsolutePath() + "/mods/");
