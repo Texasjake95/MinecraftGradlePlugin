@@ -8,6 +8,7 @@ import java.util.jar.Manifest;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Copy;
@@ -33,6 +34,7 @@ public class JavaProxy {
 		final SetATs setATs = ProjectHelper.addTask(project, "setATs", SetATs.class);
 		project.getExtensions().create("atSetup", ExtensionATExtract.class);
 		project.getExtensions().create("modSetup", ExtensionModSetup.class);
+		project.getExtensions().create("skipConfiguration", ExtensionConfigurationSkip.class);
 		project.afterEvaluate(new Action<Project>() {
 			
 			@Override
@@ -40,22 +42,31 @@ public class JavaProxy {
 			{
 				if (setup)
 				{
-					for (Dependency dep : project.getConfigurations().getByName("default").getAllDependencies())
+					for (Configuration configuration : project.getConfigurations())
 					{
-						for (File file : project.getConfigurations().getAt("default").files(dep))
+						if (configuration != null && !skipConfiguration(project, configuration.getName()))
 						{
-							if (file != null && file.getAbsolutePath().endsWith("jar"))
-								try
+							for (Dependency dep : configuration.getAllDependencies())
+							{
+								if (dep != null && !skipDependency(project, dep.getName()))
 								{
-									if (checkForATs(new JarFile(file)))
+									for (File file : configuration.files(dep))
 									{
-										((ExtensionATExtract) project.getExtensions().getByName("atSetup")).addAT(file, new File(project.getBuildDir().getAbsolutePath() + "unpacked/" + dep.getName()));
+										if (file != null && isValid(file))
+										{
+											try
+											{
+												if (checkForATs(new JarFile(file)))
+													((ExtensionATExtract) project.getExtensions().getByName("atSetup")).addAT(file, new File(project.getBuildDir().getAbsolutePath() + "unpacked/" + dep.getName()));
+											}
+											catch (IOException e)
+											{
+												e.printStackTrace();
+											}
+										}
 									}
 								}
-								catch (IOException e)
-								{
-									e.printStackTrace();
-								}
+							}
 						}
 					}
 					for (ATExtractData data : ((ExtensionATExtract) project.getExtensions().getByName("atSetup")).getData())
@@ -83,6 +94,27 @@ public class JavaProxy {
 		project.getTasks().getByName("extractUserDev").dependsOn(setATs.getName());
 	}
 	
+	protected static boolean skipDependency(Project project, String name)
+	{
+		return ((ExtensionConfigurationSkip) project.getExtensions().getByName("skipConfiguration")).containsDepend(name);
+	}
+	
+	protected static boolean skipConfiguration(Project project, String name)
+	{
+		return ((ExtensionConfigurationSkip) project.getExtensions().getByName("skipConfiguration")).containsConfig(name);
+	}
+	
+	protected static boolean isValid(File file)
+	{
+		if (file.getAbsolutePath().endsWith("jar"))
+		{
+			if (file.getName().contains("source") || file.getName().contains("javadoc") || file.getName().contains("src"))
+				return false;
+			return true;
+		}
+		return false;
+	}
+	
 	protected static File getFile(Project project, Dependency dep)
 	{
 		String fileName = dep.getName() + "-" + dep.getVersion();
@@ -101,8 +133,9 @@ public class JavaProxy {
 		try
 		{
 			Manifest maniFest = jarFile.getManifest();
-			if (maniFest.getAttributes("FMLAT") != null)
-				return true;
+			if (maniFest != null)
+				if (maniFest.getAttributes("FMLAT") != null)
+					return true;
 		}
 		catch (IOException e)
 		{
