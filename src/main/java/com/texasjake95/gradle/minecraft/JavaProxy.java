@@ -1,8 +1,14 @@
 package com.texasjake95.gradle.minecraft;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Delete;
@@ -34,6 +40,24 @@ public class JavaProxy {
 			{
 				if (setup)
 				{
+					for (Dependency dep : project.getConfigurations().getByName("default").getAllDependencies())
+					{
+						for (File file : project.getConfigurations().getAt("default").files(dep))
+						{
+							if (file != null && file.getAbsolutePath().endsWith("jar"))
+								try
+								{
+									if (checkForATs(new JarFile(file)))
+									{
+										((ExtensionATExtract) project.getExtensions().getByName("atSetup")).addAT(file, new File(project.getBuildDir().getAbsolutePath() + "unpacked/" + dep.getName()));
+									}
+								}
+								catch (IOException e)
+								{
+									e.printStackTrace();
+								}
+						}
+					}
 					for (ATExtractData data : ((ExtensionATExtract) project.getExtensions().getByName("atSetup")).getData())
 					{
 						if (data.getModFile() != null)
@@ -57,6 +81,34 @@ public class JavaProxy {
 			}
 		});
 		project.getTasks().getByName("extractUserDev").dependsOn(setATs.getName());
+	}
+	
+	protected static File getFile(Project project, Dependency dep)
+	{
+		String fileName = dep.getName() + "-" + dep.getVersion();
+		for (File file : project.getConfigurations().getByName("default").getFiles())
+		{
+			if (file.getAbsolutePath().contains(fileName))
+			{
+				return file;
+			}
+		}
+		return null;
+	}
+	
+	protected static boolean checkForATs(JarFile jarFile)
+	{
+		try
+		{
+			Manifest maniFest = jarFile.getManifest();
+			if (maniFest.getAttributes("FMLAT") != null)
+				return true;
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	private static void addRequiredDeps(Project project, Task resetModFolder)
@@ -150,7 +202,7 @@ public class JavaProxy {
 	private static void addModFolder(Project project, Delete resetModFolder)
 	{
 		Copy modFolder;
-		if ((modFolder = (Copy) project.getTasks().getByName("setupModFolder")) == null)
+		if ((modFolder = (Copy) project.getTasks().findByPath("setupModFolder")) == null)
 			modFolder = ProjectHelper.addTask(project, "setupModFolder", Copy.class);
 		for (ModFolderData mod : ((ExtensionModSetup) project.getExtensions().getByName("modSetup")).getData())
 			modFolder.from(mod.getMod());
