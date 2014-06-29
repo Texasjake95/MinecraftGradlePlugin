@@ -16,6 +16,12 @@ public class ExtensionATExtract {
 			data.add(new ATExtractData(modName.toString(), at, fileUnpacked));
 	}
 	
+	public void addAT(Object modName, File fileUnpacked)
+	{
+		if (Checker.areAllNotNull(modName, fileUnpacked))
+			data.add(new ATExtractData(modName.toString(), fileUnpacked));
+	}
+	
 	public List<ATExtractData> getData()
 	{
 		return data;

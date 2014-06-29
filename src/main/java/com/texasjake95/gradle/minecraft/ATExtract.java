@@ -1,6 +1,9 @@
 package com.texasjake95.gradle.minecraft;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
@@ -48,9 +51,46 @@ public class ATExtract extends DefaultTask {
 	@TaskAction
 	public void doTask()
 	{
-		String atLoc = fileUnpacked + "/" + at;
-		String dest = atFolder.getAbsolutePath() + "/" + at;
 		FileHelper.extractFolder(modFile, fileUnpacked.getAbsolutePath(), false);
-		FileHelper.copyFileTo(atLoc, dest);
+		if (modFile.endsWith("\\.jar"))
+		{
+			JarFile jar = null;
+			try
+			{
+				jar = new JarFile(modFile);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			if (jar != null)
+			{
+				Manifest manifest = null;
+				try
+				{
+					manifest = jar.getManifest();
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+				if (manifest != null)
+				{
+					String atList = manifest.getMainAttributes().getValue("FMLAT");
+					for (String at : atList.split(" "))
+					{
+						String maniFestAT = fileUnpacked + "/META-INF/" + at;
+						String maniFestDest = atFolder.getAbsolutePath() + "/" + at;
+						FileHelper.copyFileTo(maniFestAT, maniFestDest);
+					}
+				}
+			}
+		}
+		if (at != null)
+		{
+			String atLoc = fileUnpacked + "/" + at;
+			String dest = atFolder.getAbsolutePath() + "/" + at;
+			FileHelper.copyFileTo(atLoc, dest);
+		}
 	}
 }
