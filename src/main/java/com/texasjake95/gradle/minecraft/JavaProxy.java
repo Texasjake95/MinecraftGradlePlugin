@@ -8,7 +8,6 @@ import java.util.jar.Manifest;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Copy;
@@ -42,9 +41,10 @@ public class JavaProxy {
 			{
 				if (setup)
 				{
+					/*
 					for (Configuration configuration : project.getConfigurations())
 					{
-						if (configuration != null && !skipConfiguration(project, configuration.getName()))
+						if (configuration != null && !skipConfiguration(project, configuration.getName()) && configuration.getState() == State.RESOLVED)
 						{
 							for (Dependency dep : configuration.getAllDependencies())
 							{
@@ -69,6 +69,7 @@ public class JavaProxy {
 							}
 						}
 					}
+					*/
 					for (ATExtractData data : ((ExtensionATExtract) project.getExtensions().getByName("atSetup")).getData())
 					{
 						if (data.getModFile() != null)
