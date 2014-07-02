@@ -187,6 +187,7 @@ public class JavaProxy {
 	private static void configureRunTasks(Project project)
 	{
 		JavaExec task = (JavaExec) project.getTasks().getByName("runClient");
+		setClient(task, project);
 		task = (JavaExec) project.getTasks().getByName("debugClient");
 		setClient(task, project);
 		task = (JavaExec) project.getTasks().getByName("runServer");

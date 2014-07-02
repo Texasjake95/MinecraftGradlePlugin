@@ -49,6 +49,7 @@ public class ExtensionConfigurationSkip {
 		dataDepend.add("lwjgl_util");
 		dataDepend.add("twitch");
 		dataDepend.add("forgeSrc");
+		dataDepend.add("forgeBin");
 	}
 	
 	public void skipConfig(String config)
