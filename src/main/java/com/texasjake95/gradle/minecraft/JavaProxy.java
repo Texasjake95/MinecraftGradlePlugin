@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.regex.Pattern;
 
 import org.gradle.api.Action;
 import org.gradle.api.Project;
@@ -16,6 +17,9 @@ import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskCollection;
 import org.gradle.api.tasks.bundling.Jar;
 
+import com.google.common.base.Strings;
+
+import net.minecraftforge.gradle.common.BaseExtension;
 import net.minecraftforge.gradle.tasks.user.SourceCopyTask;
 import net.minecraftforge.gradle.user.patch.UserPatchExtension;
 
@@ -24,6 +28,7 @@ import com.texasjake95.gradle.ProjectHelper;
 public class JavaProxy {
 	
 	public static boolean setup = true;
+	private static final Pattern VERSION_CHECK = Pattern.compile("([\\d._pre]+)-([\\w\\d.]+)(?:-[\\w\\d.]+)?");
 	
 	public static void apply(Project project)
 	{
@@ -41,35 +46,7 @@ public class JavaProxy {
 			{
 				if (setup)
 				{
-					/*
-					for (Configuration configuration : project.getConfigurations())
-					{
-						if (configuration != null && !skipConfiguration(project, configuration.getName()) && configuration.getState() == State.RESOLVED)
-						{
-							for (Dependency dep : configuration.getAllDependencies())
-							{
-								if (dep != null && !skipDependency(project, dep.getName()))
-								{
-									for (File file : configuration.files(dep))
-									{
-										if (file != null && isValid(file))
-										{
-											try
-											{
-												if (checkForATs(new JarFile(file)))
-													((ExtensionATExtract) project.getExtensions().getByName("atSetup")).addAT(file, new File(project.getBuildDir().getAbsolutePath() + "unpacked/" + dep.getName()));
-											}
-											catch (IOException e)
-											{
-												e.printStackTrace();
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-					*/
+					setupMinecraftExtension(project);
 					for (ATExtractData data : ((ExtensionATExtract) project.getExtensions().getByName("atSetup")).getData())
 					{
 						if (data.getModFile() != null)
@@ -93,6 +70,15 @@ public class JavaProxy {
 			}
 		});
 		project.getTasks().getByName("extractUserDev").dependsOn(setATs.getName());
+	}
+	
+	private static void setupMinecraftExtension(Project project)
+	{
+		BaseExtension patch = (BaseExtension) project.getExtensions().getByName("minecraft");
+		if (Strings.isNullOrEmpty(patch.getVersion()) || patch.getVersion().equals("null") || !VERSION_CHECK.matcher(patch.getVersion()).matches())
+			patch.setVersion(project.property("minecraft_version") + "-" + MinecraftForgeVersion.getVersion(project));
+		if (new File("../run").exists())
+			patch.setAssetDir("../run/assets");
 	}
 	
 	protected static boolean skipDependency(Project project, String name)
