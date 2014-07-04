@@ -24,30 +24,35 @@ public class MinecraftForgeVersion {
 		String version = getUserForge(project);
 		if (version != null)
 			return version;
-		try
-		{
-			URL url = new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json");
-			InputStream con = url.openStream();
-			String data = new String(ByteStreams.toByteArray(con));
-			con.close();
-			Map<String, Object> json = new Gson().fromJson(data, Map.class);
-			// String homepage = (String)json.get("homepage");
-			Map<String, String> promos = (Map<String, String>) json.get("promos");
-			String rec = promos.get(project.property("minecraft_version") + "-recommended");
-			String lat = promos.get(project.property("minecraft_version") + "-latest");
-			boolean useLatest = project.hasProperty("useLatest") ? (boolean) project.property("useLatest") : false;
-			if (rec != null && !useLatest)
+		File versionFile = new File(project.getBuildDir().getAbsolutePath() + "/version.info");
+		if (!project.getGradle().getStartParameter().isOffline())
+			try
 			{
-				return getWebForge(project, rec, useLatest);
+				URL url = new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json");
+				InputStream con = url.openStream();
+				String data = new String(ByteStreams.toByteArray(con));
+				con.close();
+				Map<String, Object> json = new Gson().fromJson(data, Map.class);
+				// String homepage = (String)json.get("homepage");
+				Map<String, String> promos = (Map<String, String>) json.get("promos");
+				String rec = promos.get(project.property("minecraft_version") + "-recommended");
+				String lat = promos.get(project.property("minecraft_version") + "-latest");
+				boolean useLatest = project.hasProperty("useLatest") ? getPropertyAsBoolean(project, "useLatest") : false;
+				if (rec != null && !useLatest)
+				{
+					return getWebForge(project, rec, versionFile, useLatest);
+				}
+				if (lat != null)
+				{
+					return getWebForge(project, lat, versionFile, useLatest);
+				}
 			}
-			if (lat != null)
+			catch (Exception e)
 			{
-				return getWebForge(project, lat, useLatest);
 			}
-		}
-		catch (Exception e)
+		if (versionFile.exists())
 		{
-			FileInput fi = new FileInput(new File(project.getBuildDir().getAbsolutePath() + "/version.info"));
+			FileInput fi = new FileInput(versionFile);
 			ArrayList<String> lines = fi.getFileLines();
 			if (lines.size() > 0)
 			{
@@ -55,7 +60,15 @@ public class MinecraftForgeVersion {
 				return lines.get(0);
 			}
 		}
-		throw new IllegalArgumentException("Unable to connect to the internet. Please specify a forge version to use (CommandLine => -Pforge_version=X.X.X.X or gradle.properties=> forge_version=X.X.X.X)");
+		throw new IllegalArgumentException("Unable to connect to the internet. Please specify a forge version to use (CommandLine => -Pforge_version=X.X.X.X or gradle.properties => forge_version=X.X.X.X)");
+	}
+	
+	private static <T> boolean getPropertyAsBoolean(Project project, String propName)
+	{
+		Object prop = project.property(propName);
+		if (prop instanceof Boolean)
+			return (boolean) prop;
+		return false;
 	}
 	
 	private static String getUserForge(Project project)
@@ -68,7 +81,7 @@ public class MinecraftForgeVersion {
 		return null;
 	}
 	
-	private static String getWebForge(Project project, String version, boolean isLatest) throws IOException
+	private static String getWebForge(Project project, String version, File file, boolean isLatest) throws IOException
 	{
 		FileOutput fo = new FileOutput(new File(project.getBuildDir().getAbsolutePath() + "/version.info"));
 		fo.println(version);
