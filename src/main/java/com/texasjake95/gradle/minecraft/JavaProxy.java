@@ -32,6 +32,7 @@ public class JavaProxy {
 	
 	public static void apply(Project project)
 	{
+		setupMinecraftExtension(project);
 		final Delete resetModFolder = ProjectHelper.addTask(project, "resetModFolder", Delete.class);
 		resetModFolder.delete(project.getProjectDir().getAbsolutePath() + "/mods/");
 		addRequiredDeps(project, resetModFolder);
@@ -46,7 +47,6 @@ public class JavaProxy {
 			{
 				if (setup)
 				{
-					setupMinecraftExtension(project);
 					for (ATExtractData data : ((ExtensionATExtract) project.getExtensions().getByName("atSetup")).getData())
 					{
 						if (data.getModFile() != null)
