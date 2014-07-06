@@ -26,10 +26,10 @@ import net.minecraftforge.gradle.user.patch.UserPatchExtension;
 import com.texasjake95.gradle.ProjectHelper;
 
 public class JavaProxy {
-	
+
 	public static boolean setup = true;
 	private static final Pattern VERSION_CHECK = Pattern.compile("([\\d._pre]+)-([\\w\\d.]+)(?:-[\\w\\d.]+)?");
-	
+
 	public static void apply(Project project)
 	{
 		setupMinecraftExtension(project);
@@ -40,13 +40,16 @@ public class JavaProxy {
 		project.getExtensions().create("atSetup", ExtensionATExtract.class);
 		project.getExtensions().create("modSetup", ExtensionModSetup.class);
 		project.getExtensions().create("skipConfiguration", ExtensionConfigurationSkip.class);
+		project.getExtensions().create("depAdd", DependencyManager.class, project);
 		project.afterEvaluate(new Action<Project>() {
-			
+
 			@Override
 			public void execute(Project project)
 			{
 				if (setup)
 				{
+					DependencyManager depAdd = (DependencyManager) project.getExtensions().getByName("depAdd");
+					depAdd.handleAfterThought();
 					for (ATExtractData data : ((ExtensionATExtract) project.getExtensions().getByName("atSetup")).getData())
 					{
 						if (data.getModFile() != null)
@@ -71,26 +74,26 @@ public class JavaProxy {
 		});
 		project.getTasks().getByName("extractUserDev").dependsOn(setATs.getName());
 	}
-	
+
 	private static void setupMinecraftExtension(Project project)
 	{
 		BaseExtension patch = (BaseExtension) project.getExtensions().getByName("minecraft");
 		if (Strings.isNullOrEmpty(patch.getVersion()) || patch.getVersion().equals("null") || !VERSION_CHECK.matcher(patch.getVersion()).matches())
-			patch.setVersion(project.property("minecraft_version") + "-" + MinecraftForgeVersion.getVersion(project));
+			patch.setVersion(project.property("minecraft_version") + "-" + MinecraftForgeVersion.getForgeVersion(project));
 		if (new File("../run").exists())
 			patch.setAssetDir("../run/assets");
 	}
-	
+
 	protected static boolean skipDependency(Project project, String name)
 	{
 		return ((ExtensionConfigurationSkip) project.getExtensions().getByName("skipConfiguration")).containsDepend(name);
 	}
-	
+
 	protected static boolean skipConfiguration(Project project, String name)
 	{
 		return ((ExtensionConfigurationSkip) project.getExtensions().getByName("skipConfiguration")).containsConfig(name);
 	}
-	
+
 	protected static boolean isValid(File file)
 	{
 		if (file.getAbsolutePath().endsWith("jar"))
@@ -101,7 +104,7 @@ public class JavaProxy {
 		}
 		return false;
 	}
-	
+
 	protected static File getFile(Project project, Dependency dep)
 	{
 		String fileName = dep.getName() + "-" + dep.getVersion();
@@ -114,7 +117,7 @@ public class JavaProxy {
 		}
 		return null;
 	}
-	
+
 	protected static boolean checkForATs(JarFile jarFile)
 	{
 		try
@@ -130,7 +133,7 @@ public class JavaProxy {
 		}
 		return false;
 	}
-	
+
 	private static void addRequiredDeps(Project project, Task resetModFolder)
 	{
 		Task task = project.getTasks().getByName("setupDecompWorkspace");
@@ -146,7 +149,7 @@ public class JavaProxy {
 		task = project.getTasks().getByName("debugServer");
 		task.dependsOn(resetModFolder.getName());
 	}
-	
+
 	private static void addJarTasks(Project project)
 	{
 		SourceCopyTask task = (SourceCopyTask) project.getTasks().getByName("sourceMainJava");
@@ -170,7 +173,7 @@ public class JavaProxy {
 		jar = (Jar) project.getTasks().getByName("sourceJar");
 		jar.from(task.getOutput());
 	}
-	
+
 	private static void configureRunTasks(Project project)
 	{
 		JavaExec task = (JavaExec) project.getTasks().getByName("runClient");
@@ -182,12 +185,12 @@ public class JavaProxy {
 		task = (JavaExec) project.getTasks().getByName("debugServer");
 		setServer(task, project);
 	}
-	
+
 	private static void setServer(JavaExec task, Project project)
 	{
 		setJavaExec(task, project, false);
 	}
-	
+
 	private static void setJavaExec(JavaExec task, Project project, boolean isClient)
 	{
 		if (isClient)
@@ -200,26 +203,26 @@ public class JavaProxy {
 		task.args("--gameDir=" + getGameDir(project));
 		task.args("--assetsDir=" + getAssetsDir(project));
 	}
-	
+
 	private static void setClient(JavaExec task, Project project)
 	{
 		setJavaExec(task, project, true);
 	}
-	
+
 	private static String getGameDir(Project project)
 	{
 		if (project.hasProperty("mcGameDir"))
 			return (String) project.property("mcGameDir");
 		return project.getProjectDir().getAbsolutePath();
 	}
-	
+
 	private static String getAssetsDir(Project project)
 	{
 		if (project.hasProperty("mcAssetsDir"))
 			return (String) project.property("mcAssetsDir");
 		return ((UserPatchExtension) project.getExtensions().getByName("minecraft")).getAssetDir();
 	}
-	
+
 	private static void addModFolder(Project project, Delete resetModFolder)
 	{
 		Copy modFolder;
@@ -231,7 +234,7 @@ public class JavaProxy {
 		modFolder.dependsOn(resetModFolder.getName());
 		addRequiredDeps(project, modFolder);
 	}
-	
+
 	private static boolean checkModFolder(ExtensionModSetup modSetup)
 	{
 		return !modSetup.getData().isEmpty();

@@ -1,34 +1,36 @@
 package com.texasjake95.gradle.minecraft;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.gradle.api.Project;
 
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 
-import com.texasjake95.commons.file.FileInput;
 import com.texasjake95.commons.file.FileOutput;
 
 public class MinecraftForgeVersion {
-	
+
+	private static final String urlFormat = "http://files.minecraftforge.net/maven/%s/%s/promotions_slim.json";
+
 	@SuppressWarnings("unchecked")
-	public static String getVersion(Project project)
+	public static String getVersion(Project project, String mod, String group, String versionProp)
 	{
-		project.getLogger().debug("Attempting to get forge version");
-		String version = getUserForge(project);
+		project.getLogger().debug("Attempting to get " + mod + " version");
+		String version = getUserForge(project, mod, versionProp);
 		if (version != null)
 			return version;
 		File versionFile = new File(project.getBuildDir().getAbsolutePath() + "/version.info");
 		if (!project.getGradle().getStartParameter().isOffline())
 			try
 			{
-				URL url = new URL("http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions_slim.json");
+				URL url = new URL(String.format(urlFormat, group.replace(".", "/"), mod));
 				InputStream con = url.openStream();
 				String data = new String(ByteStreams.toByteArray(con));
 				con.close();
@@ -37,14 +39,14 @@ public class MinecraftForgeVersion {
 				Map<String, String> promos = (Map<String, String>) json.get("promos");
 				String rec = promos.get(project.property("minecraft_version") + "-recommended");
 				String lat = promos.get(project.property("minecraft_version") + "-latest");
-				boolean useLatest = project.hasProperty("useLatest") ? getPropertyAsBoolean(project, "useLatest") : false;
+				boolean useLatest = project.hasProperty("useLatest" + mod) ? getPropertyAsBoolean(project, "useLatest" + mod) : false;
 				if (rec != null && !useLatest)
 				{
-					return getWebForge(project, rec, versionFile, useLatest);
+					return getWebForge(project, mod, rec, versionFile, useLatest);
 				}
 				if (lat != null)
 				{
-					return getWebForge(project, lat, versionFile, useLatest);
+					return getWebForge(project, mod, lat, versionFile, useLatest);
 				}
 			}
 			catch (Exception e)
@@ -52,41 +54,87 @@ public class MinecraftForgeVersion {
 			}
 		if (versionFile.exists())
 		{
-			FileInput fi = new FileInput(versionFile);
-			ArrayList<String> lines = fi.getFileLines();
-			if (lines.size() > 0)
+			try
 			{
-				project.getLogger().debug("Using last retrieved version of forge");
-				return lines.get(0);
+				String fileVersion = getVersionFromFile(project, versionFile, mod + "Version");
+				if (fileVersion != null)
+					return fileVersion;
+			}
+			catch (Exception e)
+			{
 			}
 		}
-		throw new IllegalArgumentException("Unable to connect to the internet. Please specify a forge version to use (CommandLine => -Pforge_version=X.X.X.X or gradle.properties => forge_version=X.X.X.X)");
+		throw new IllegalArgumentException("Unable to connect to the internet. Please specify a " + mod + " version to use (CommandLine => -P" + versionProp + "=X.X.X.X or gradle.properties => " + versionProp + "=X.X.X.X)");
 	}
-	
-	private static <T> boolean getPropertyAsBoolean(Project project, String propName)
+
+	public static String getForgeVersion(Project project)
+	{
+		return getVersion(project, "forge", "net.minecraftforge", "forge_version");
+	}
+
+	private static boolean getPropertyAsBoolean(Project project, String propName)
 	{
 		Object prop = project.property(propName);
 		if (prop instanceof Boolean)
 			return (boolean) prop;
 		return false;
 	}
-	
-	private static String getUserForge(Project project)
+
+	private static String getUserForge(Project project, String mod, String versionProp)
 	{
-		if (project.hasProperty("forge_version"))
+		if (project.hasProperty(versionProp))
 		{
-			project.getLogger().debug("Using user defined version of forge");
-			return (String) project.property("forge_version");
+			project.getLogger().debug("Using user defined version of " + mod);
+			return (String) project.property(versionProp);
 		}
 		return null;
 	}
-	
-	private static String getWebForge(Project project, String version, File file, boolean isLatest) throws IOException
+
+	private static String getWebForge(Project project, String mod, String version, File file, boolean isLatest) throws IOException
 	{
-		FileOutput fo = new FileOutput(new File(project.getBuildDir().getAbsolutePath() + "/version.info"));
-		fo.println(version);
-		fo.close();
-		project.getLogger().debug(String.format("Using %s version of forge", isLatest ? "Latest" : "Recommended"));
+		updateVersionFile(project, file, mod, version);
+		project.getLogger().debug(String.format("Using %s version of " + mod, isLatest ? "Latest" : "Recommended"));
 		return version;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static final String getVersionFromFile(Project project, File file, String id) throws IOException
+	{
+		FileInputStream fs = new FileInputStream(file);
+		String jsonString = new String(ByteStreams.toByteArray(fs));
+		Map<String, Object> json = new Gson().fromJson(jsonString, Map.class);
+		if (json.containsKey(id))
+			return (String) json.get(id);
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void updateVersionFile(Project project, File file, String mod, String version) throws IOException
+	{
+		Gson gson = new Gson();
+		String jsonString;
+		Map<String, Object> json;
+		if (file.exists())
+		{
+			FileInputStream fs = new FileInputStream(file);
+			jsonString = new String(ByteStreams.toByteArray(fs));
+			try
+			{
+				json = gson.fromJson(jsonString, Map.class);
+			}
+			catch (Exception e)
+			{
+				json = Maps.newHashMap();
+			}
+		}
+		else
+		{
+			json = Maps.newHashMap();
+		}
+		json.put(mod + "Version", version);
+		jsonString = gson.toJson(json);
+		FileOutput fo = new FileOutput(file);
+		fo.println(jsonString);
+		fo.close();
 	}
 }
