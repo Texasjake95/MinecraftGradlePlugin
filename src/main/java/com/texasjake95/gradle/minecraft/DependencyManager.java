@@ -95,28 +95,30 @@ public class DependencyManager {
 	public static File getFile(Project project, String depName, String version, String classifer)
 	{
 		String depFile = getFileName(depName, version, classifer);
-		for (File file : project.getConfigurations().getByName("afterThought").resolve())
-		{
-			String fileName = file.getName();
-			if (fileName.contains("sources") || fileName.contains("javadoc"))
-				continue;
-			if (fileName.contains(depFile))
+		if (project.getConfigurations().getNames().contains("afterThought"))
+			for (File file : project.getConfigurations().getByName("afterThought").resolve())
 			{
-				return file;
+				String fileName = file.getName();
+				if (fileName.contains("sources") || fileName.contains("javadoc"))
+					continue;
+				if (fileName.contains(depFile))
+				{
+					return file;
+				}
 			}
-		}
 		return null;
 	}
 
 	private static boolean checkForDep(Project project, String group, String artifact, String version)
 	{
-		for (Dependency dep : project.getConfigurations().getByName("afterThought").getAllDependencies())
-		{
-			if (dep != null)
-				if (dep.getGroup() != null && dep.getName() != null && dep.getVersion() != null)
-					if (dep.getGroup().equals(group) && dep.getName().equals(artifact) && dep.getVersion().equals(version))
-						return true;
-		}
+		if (project.getConfigurations().getNames().contains("afterThought"))
+			for (Dependency dep : project.getConfigurations().getByName("afterThought").getAllDependencies())
+			{
+				if (dep != null)
+					if (dep.getGroup() != null && dep.getName() != null && dep.getVersion() != null)
+						if (dep.getGroup().equals(group) && dep.getName().equals(artifact) && dep.getVersion().equals(version))
+							return true;
+			}
 		return false;
 	}
 
