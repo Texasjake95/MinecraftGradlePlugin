@@ -44,10 +44,8 @@ public class DependencyManager {
 		version = project.property("minecraft_version") + "-" + version;
 		ProjectHelper.addDependency(project, getDepString("codechicken", "CodeChickenLib", version, "dev"));
 		ProjectHelper.addDependency(project, getDepString("codechicken", "CodeChickenLib", version, "src"));
-		
 		addAfterThoughtDep(project, getDepString("codechicken", "CodeChickenLib", version, "dev"));
 		addAfterThoughtDep(project, getDepString("codechicken", "CodeChickenLib", version, "src"));
-		
 		afterThoughts.add(new AfterThought("CodeChickenLib", version, "dev"));
 	}
 
@@ -76,14 +74,14 @@ public class DependencyManager {
 		ProjectHelper.addDependency(project, getDepString("codechicken", mod, version, "src"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "dev"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "src"));
-
 		manager.afterThoughts.add(new AfterThought(mod, version, "dev"));
 	}
-	
+
 	private static void addAfterThoughtDep(Project project, String dep)
 	{
+		if (!project.getConfigurations().contains("afterThought"))
+			project.getConfigurations().create("afterThought");
 		project.getDependencies().add("afterThought", dep);
-
 	}
 
 	private static void addChickenBonesModWithAT(Project project, DependencyManager manager, String mod, String versionProp, String atName, String unpackedDir)
