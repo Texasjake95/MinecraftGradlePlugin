@@ -87,6 +87,9 @@ public class DependencyManager {
 		String version = project.property("minecraft_version") + "-" + CCVersion.getVersion(project, mod, versionProp);
 		ProjectHelper.addDependency(project, getDepString("codechicken", mod, version, "dev"));
 		ProjectHelper.addDependency(project, getDepString("codechicken", mod, version, "src"));
+		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "dev"));
+		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "src"));
+		
 		manager.afterThoughts.add(new AfterThought(mod, version, "dev", "nei_at.cfg", "NEI"));
 	}
 
