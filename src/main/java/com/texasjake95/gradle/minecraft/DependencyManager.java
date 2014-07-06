@@ -44,6 +44,10 @@ public class DependencyManager {
 		version = project.property("minecraft_version") + "-" + version;
 		ProjectHelper.addDependency(project, getDepString("codechicken", "CodeChickenLib", version, "dev"));
 		ProjectHelper.addDependency(project, getDepString("codechicken", "CodeChickenLib", version, "src"));
+		
+		addAfterThoughtDep(project, getDepString("codechicken", "CodeChickenLib", version, "dev"));
+		addAfterThoughtDep(project, getDepString("codechicken", "CodeChickenLib", version, "src"));
+		
 		afterThoughts.add(new AfterThought("CodeChickenLib", version, "dev"));
 	}
 
@@ -70,7 +74,16 @@ public class DependencyManager {
 		String version = project.property("minecraft_version") + "-" + CCVersion.getVersion(project, mod, versionProp);
 		ProjectHelper.addDependency(project, getDepString("codechicken", mod, version, "dev"));
 		ProjectHelper.addDependency(project, getDepString("codechicken", mod, version, "src"));
+		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "dev"));
+		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "src"));
+
 		manager.afterThoughts.add(new AfterThought(mod, version, "dev"));
+	}
+	
+	private static void addAfterThoughtDep(Project project, String dep)
+	{
+		project.getDependencies().add("afterThought", dep);
+
 	}
 
 	private static void addChickenBonesModWithAT(Project project, DependencyManager manager, String mod, String versionProp, String atName, String unpackedDir)
@@ -84,7 +97,7 @@ public class DependencyManager {
 	public static File getFile(Project project, String depName, String version, String classifer)
 	{
 		String depFile = getFileName(depName, version, classifer);
-		for (File file : project.getConfigurations().getByName("default").resolve())
+		for (File file : project.getConfigurations().getByName("afterThought").resolve())
 		{
 			String fileName = file.getName();
 			if (fileName.contains("sources") || fileName.contains("javadoc"))
@@ -99,7 +112,7 @@ public class DependencyManager {
 
 	private static boolean checkForDep(Project project, String group, String artifact, String version)
 	{
-		for (Dependency dep : project.getConfigurations().getByName("default").getAllDependencies())
+		for (Dependency dep : project.getConfigurations().getByName("afterThought").getAllDependencies())
 		{
 			if (dep != null)
 				if (dep.getGroup() != null && dep.getName() != null && dep.getVersion() != null)
