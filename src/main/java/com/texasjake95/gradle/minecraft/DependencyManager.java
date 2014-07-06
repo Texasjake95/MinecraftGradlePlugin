@@ -79,8 +79,6 @@ public class DependencyManager {
 
 	private static void addAfterThoughtDep(Project project, String dep)
 	{
-		if (!project.getConfigurations().getNames().contains("afterThought"))
-			project.getConfigurations().create("afterThought");
 		project.getDependencies().add("afterThought", dep);
 	}
 
