@@ -97,19 +97,16 @@ public class MinecraftForgeVersion {
 		return version;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static final String getVersionFromFile(Project project, File file, String id) throws IOException
 	{
-		FileInputStream fs = new FileInputStream(file);
-		String jsonString = new String(ByteStreams.toByteArray(fs));
-		Map<String, Object> json = new Gson().fromJson(jsonString, Map.class);
+		Map<String, Object> json = getJson(file);
 		if (json.containsKey(id))
 			return (String) json.get(id);
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public static void updateVersionFile(Project project, File file, String mod, String version) throws IOException
+	private static Map<String, Object> getJson(File file) throws IOException
 	{
 		Gson gson = new Gson();
 		String jsonString;
@@ -131,6 +128,14 @@ public class MinecraftForgeVersion {
 		{
 			json = Maps.newHashMap();
 		}
+		return json;
+	}
+
+	public static void updateVersionFile(Project project, File file, String mod, String version) throws IOException
+	{
+		Gson gson = new Gson();
+		String jsonString;
+		Map<String, Object> json = getJson(file);
 		json.put(mod + "Version", version);
 		jsonString = gson.toJson(json);
 		FileOutput fo = new FileOutput(file);
