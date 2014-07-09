@@ -5,70 +5,70 @@ import java.util.HashSet;
 import com.google.common.collect.Sets;
 
 public class ExtensionConfigurationSkip {
-	
+
 	private HashSet<String> dataConfig = Sets.newHashSet();
 	private HashSet<String> dataDepend = Sets.newHashSet();
-	
+
 	public ExtensionConfigurationSkip()
 	{
-		dataConfig.add("minecraft");
-		dataConfig.add("userDevPackageDepConfig");
-		dataConfig.add("minecraftDeps");
-		dataConfig.add("minecraftNatives");
-		dataConfig.add("archives");
-		dataDepend.add("launchwrapper");
-		dataDepend.add("asm-debug-all");
-		dataDepend.add("scala-library");
-		dataDepend.add("scala-compiler");
-		dataDepend.add("jopt-simple");
-		dataDepend.add("lzma");
-		dataDepend.add("realms");
-		dataDepend.add("commons-compress");
-		dataDepend.add("httpclient");
-		dataDepend.add("commons-logging");
-		dataDepend.add("httpcore");
-		dataDepend.add("vecmath");
-		dataDepend.add("trove4j");
-		dataDepend.add("codecjorbis");
-		dataDepend.add("codecwav");
-		dataDepend.add("libraryjavasound");
-		dataDepend.add("librarylwjglopenal");
-		dataDepend.add("soundsystem");
-		dataDepend.add("netty-all");
-		dataDepend.add("guava");
-		dataDepend.add("commons-lang3");
-		dataDepend.add("commons-io");
-		dataDepend.add("commons-codec");
-		dataDepend.add("jinput");
-		dataDepend.add("jutils");
-		dataDepend.add("gson");
-		dataDepend.add("authlib");
-		dataDepend.add("log4j-api");
-		dataDepend.add("log4j-core");
-		dataDepend.add("lwjgl");
-		dataDepend.add("lwjgl_util");
-		dataDepend.add("twitch");
-		dataDepend.add("forgeSrc");
-		dataDepend.add("forgeBin");
+		this.dataConfig.add("minecraft");
+		this.dataConfig.add("userDevPackageDepConfig");
+		this.dataConfig.add("minecraftDeps");
+		this.dataConfig.add("minecraftNatives");
+		this.dataConfig.add("archives");
+		this.dataDepend.add("launchwrapper");
+		this.dataDepend.add("asm-debug-all");
+		this.dataDepend.add("scala-library");
+		this.dataDepend.add("scala-compiler");
+		this.dataDepend.add("jopt-simple");
+		this.dataDepend.add("lzma");
+		this.dataDepend.add("realms");
+		this.dataDepend.add("commons-compress");
+		this.dataDepend.add("httpclient");
+		this.dataDepend.add("commons-logging");
+		this.dataDepend.add("httpcore");
+		this.dataDepend.add("vecmath");
+		this.dataDepend.add("trove4j");
+		this.dataDepend.add("codecjorbis");
+		this.dataDepend.add("codecwav");
+		this.dataDepend.add("libraryjavasound");
+		this.dataDepend.add("librarylwjglopenal");
+		this.dataDepend.add("soundsystem");
+		this.dataDepend.add("netty-all");
+		this.dataDepend.add("guava");
+		this.dataDepend.add("commons-lang3");
+		this.dataDepend.add("commons-io");
+		this.dataDepend.add("commons-codec");
+		this.dataDepend.add("jinput");
+		this.dataDepend.add("jutils");
+		this.dataDepend.add("gson");
+		this.dataDepend.add("authlib");
+		this.dataDepend.add("log4j-api");
+		this.dataDepend.add("log4j-core");
+		this.dataDepend.add("lwjgl");
+		this.dataDepend.add("lwjgl_util");
+		this.dataDepend.add("twitch");
+		this.dataDepend.add("forgeSrc");
+		this.dataDepend.add("forgeBin");
 	}
-	
-	public void skipConfig(String config)
-	{
-		dataConfig.add(config);
-	}
-	
-	public void skipDependency(String config)
-	{
-		this.dataDepend.add(config);
-	}
-	
+
 	public boolean containsConfig(String string)
 	{
 		return this.dataConfig.contains(string);
 	}
-	
+
 	public boolean containsDepend(String string)
 	{
 		return this.dataDepend.contains(string);
+	}
+
+	public void skipConfig(String config)
+	{
+		this.dataConfig.add(config);
+	}
+
+	public void skipDependency(String config)
+	{
+		this.dataDepend.add(config);
 	}
 }

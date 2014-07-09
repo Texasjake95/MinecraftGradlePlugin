@@ -1,24 +1,25 @@
 package com.texasjake95.gradle.minecraft;
 
 public class ModFolderData {
-	
+
+	private String mod;
+
 	public ModFolderData(String mod)
 	{
 		this.mod = mod;
 	}
-	
-	private String mod;
-	
+
 	public String getMod()
 	{
-		return mod;
+		return this.mod;
 	}
-	
+
 	public void setMod(String mod)
 	{
 		this.mod = mod;
 	}
-	
+
+	@Override
 	public String toString()
 	{
 		return this.mod;

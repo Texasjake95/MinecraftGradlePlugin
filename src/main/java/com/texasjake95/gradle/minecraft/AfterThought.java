@@ -6,56 +6,6 @@ import org.gradle.api.Project;
 
 public class AfterThought {
 
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public String getVersion()
-	{
-		return version;
-	}
-
-	public void setVersion(String version)
-	{
-		this.version = version;
-	}
-
-	public String getClassifer()
-	{
-		return classifer;
-	}
-
-	public void setClassifer(String classifer)
-	{
-		this.classifer = classifer;
-	}
-
-	public String getAtName()
-	{
-		return atName;
-	}
-
-	public void setAtName(String atName)
-	{
-		this.atName = atName;
-	}
-
-	public String getUnPackDir()
-	{
-		return unPackDir;
-	}
-
-	public void setUnPackDir(String unPackDir)
-	{
-		this.unPackDir = unPackDir;
-	}
-
 	private String name;
 	private String version;
 	private String classifer;
@@ -80,14 +30,59 @@ public class AfterThought {
 		this.hasAT = true;
 	}
 
+	public String getAtName()
+	{
+		return this.atName;
+	}
+
+	public String getClassifer()
+	{
+		return this.classifer;
+	}
+
 	public File getFile(Project project)
 	{
-		return DependencyManager.getFile(project, name, version, classifer);
+		return DependencyManager.getFile(project, this.name, this.version, this.classifer);
+	}
+
+	public String getName()
+	{
+		return this.name;
 	}
 
 	public String getSoruceClassifer()
 	{
-		return soruceClassifer;
+		return this.soruceClassifer;
+	}
+
+	public String getUnPackDir()
+	{
+		return this.unPackDir;
+	}
+
+	public String getVersion()
+	{
+		return this.version;
+	}
+
+	public boolean hasAT()
+	{
+		return this.hasAT;
+	}
+
+	public void setAtName(String atName)
+	{
+		this.atName = atName;
+	}
+
+	public void setClassifer(String classifer)
+	{
+		this.classifer = classifer;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 	public void setSoruceClassifer(String soruceClassifer)
@@ -95,8 +90,13 @@ public class AfterThought {
 		this.soruceClassifer = soruceClassifer;
 	}
 
-	public boolean hasAT()
+	public void setUnPackDir(String unPackDir)
 	{
-		return this.hasAT;
+		this.unPackDir = unPackDir;
+	}
+
+	public void setVersion(String version)
+	{
+		this.version = version;
 	}
 }

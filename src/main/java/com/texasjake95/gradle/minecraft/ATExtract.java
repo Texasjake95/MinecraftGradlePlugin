@@ -11,53 +11,22 @@ import org.gradle.api.tasks.TaskAction;
 import com.texasjake95.commons.file.FileHelper;
 
 public class ATExtract extends DefaultTask {
-	
+
 	private String modFile;
 	private String at;
 	private File fileUnpacked;
-	
-	public String getAt()
-	{
-		return at;
-	}
-	
-	public void setAt(String at)
-	{
-		this.at = at;
-	}
-	
-	public File getFileUnpacked()
-	{
-		return fileUnpacked;
-	}
-	
-	public void setFileUnpacked(File fileUnpacked)
-	{
-		this.fileUnpacked = fileUnpacked;
-	}
-	
 	private final File atFolder = new File(this.getProject().getBuildDir(), "/ats/");
-	
-	public String getModFile()
-	{
-		return modFile;
-	}
-	
-	public void setModFile(String modFile)
-	{
-		this.modFile = modFile;
-	}
-	
+
 	@TaskAction
 	public void doTask()
 	{
-		FileHelper.extractFolder(modFile, fileUnpacked.getAbsolutePath(), false);
-		if (modFile.endsWith("\\.jar"))
+		FileHelper.extractFolder(this.modFile, this.fileUnpacked.getAbsolutePath(), false);
+		if (this.modFile.endsWith("\\.jar"))
 		{
 			JarFile jar = null;
 			try
 			{
-				jar = new JarFile(modFile);
+				jar = new JarFile(this.modFile);
 			}
 			catch (IOException e)
 			{
@@ -79,18 +48,48 @@ public class ATExtract extends DefaultTask {
 					String atList = manifest.getMainAttributes().getValue("FMLAT");
 					for (String at : atList.split(" "))
 					{
-						String maniFestAT = fileUnpacked + "/META-INF/" + at;
-						String maniFestDest = atFolder.getAbsolutePath() + "/" + at;
+						String maniFestAT = this.fileUnpacked + "/META-INF/" + at;
+						String maniFestDest = this.atFolder.getAbsolutePath() + "/" + at;
 						FileHelper.copyFileTo(maniFestAT, maniFestDest);
 					}
 				}
 			}
 		}
-		if (at != null)
+		if (this.at != null)
 		{
-			String atLoc = fileUnpacked + "/" + at;
-			String dest = atFolder.getAbsolutePath() + "/" + at;
+			String atLoc = this.fileUnpacked + "/" + this.at;
+			String dest = this.atFolder.getAbsolutePath() + "/" + this.at;
 			FileHelper.copyFileTo(atLoc, dest);
 		}
+	}
+
+	public String getAt()
+	{
+		return this.at;
+	}
+
+	public File getFileUnpacked()
+	{
+		return this.fileUnpacked;
+	}
+
+	public String getModFile()
+	{
+		return this.modFile;
+	}
+
+	public void setAt(String at)
+	{
+		this.at = at;
+	}
+
+	public void setFileUnpacked(File fileUnpacked)
+	{
+		this.fileUnpacked = fileUnpacked;
+	}
+
+	public void setModFile(String modFile)
+	{
+		this.modFile = modFile;
 	}
 }
