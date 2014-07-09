@@ -92,7 +92,7 @@ public class DependencyManager {
 		ProjectHelper.addDependency(this.project, "runtime", getDepString("cpw.mods", "ironchest", version, "src"));
 		addAfterThoughtDep(this.project, getDepString("cpw.mods", "ironchest", version, "deobf"));
 		addAfterThoughtDep(this.project, getDepString("cpw.mods", "ironchest", version, "src"));
-		this.afterThoughts.add(new AfterThought("ironchest", version, "deobf", "src"));
+		this.afterThoughts.add(new AfterThought("ironchest", version, "deobf", "src").setModFolder(false));
 	}
 
 	public void addNEI()
@@ -113,7 +113,8 @@ public class DependencyManager {
 			File file = afterThought.getFile(this.project);
 			if (file != null)
 			{
-				modSetup.addMod(file);
+				if (afterThought.copyToModFolder())
+					modSetup.addMod(file);
 				eclipseSetup.addEclipseSetup(afterThought.getName() + "-" + afterThought.getVersion(), afterThought.getClassifer(), afterThought.getSoruceClassifer());
 				if (afterThought.hasAT())
 					atSetup.addAT(file, afterThought.getAtName(), new File(this.project.getBuildDir().getAbsolutePath() + "/unpacked/" + afterThought.getUnPackDir() + "/"));

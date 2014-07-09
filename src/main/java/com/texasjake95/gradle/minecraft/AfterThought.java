@@ -15,6 +15,7 @@ public class AfterThought {
 	private String atName;
 	private String unPackDir;
 	private String soruceClassifer;
+	private boolean copy = true;
 
 	public AfterThought(String name, String version, String classifer, String soruceClassifer)
 	{
@@ -22,6 +23,17 @@ public class AfterThought {
 		this.version = version;
 		this.classifer = classifer;
 		this.soruceClassifer = soruceClassifer;
+	}
+
+	public AfterThought setModFolder(boolean copy)
+	{
+		this.copy = copy;
+		return this;
+	}
+
+	public boolean copyToModFolder()
+	{
+		return this.copy;
 	}
 
 	public AfterThought(String name, String version, String classifer, String soruceClassifer, String atName, String unPackDir)
