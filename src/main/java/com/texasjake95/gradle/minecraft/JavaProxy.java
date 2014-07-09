@@ -67,7 +67,6 @@ public class JavaProxy {
 					{
 						addModFolder(project, resetModFolder);
 					}
-					configureRunTasks(project);
 					addJarTasks(project);
 				}
 				setup = false;
@@ -173,55 +172,6 @@ public class JavaProxy {
 		//
 		jar = (Jar) project.getTasks().getByName("sourceJar");
 		jar.from(task.getOutput());
-	}
-
-	private static void configureRunTasks(Project project)
-	{
-		JavaExec task = (JavaExec) project.getTasks().getByName("runClient");
-		setClient(task, project);
-		task = (JavaExec) project.getTasks().getByName("debugClient");
-		setClient(task, project);
-		task = (JavaExec) project.getTasks().getByName("runServer");
-		setServer(task, project);
-		task = (JavaExec) project.getTasks().getByName("debugServer");
-		setServer(task, project);
-	}
-
-	private static void setServer(JavaExec task, Project project)
-	{
-		setJavaExec(task, project, false);
-	}
-
-	private static void setJavaExec(JavaExec task, Project project, boolean isClient)
-	{
-		if (isClient)
-		{
-			if (project.hasProperty("mcUsername"))
-				task.args("--username=" + project.property("mcUsername"));
-			if (project.hasProperty("mcPassword"))
-				task.args("--password=" + project.property("mcPassword"));
-		}
-		task.args("--gameDir=" + getGameDir(project));
-		task.args("--assetsDir=" + getAssetsDir(project));
-	}
-
-	private static void setClient(JavaExec task, Project project)
-	{
-		setJavaExec(task, project, true);
-	}
-
-	private static String getGameDir(Project project)
-	{
-		if (project.hasProperty("mcGameDir"))
-			return (String) project.property("mcGameDir");
-		return project.getProjectDir().getAbsolutePath();
-	}
-
-	private static String getAssetsDir(Project project)
-	{
-		if (project.hasProperty("mcAssetsDir"))
-			return (String) project.property("mcAssetsDir");
-		return ((UserPatchExtension) project.getExtensions().getByName("minecraft")).getAssetDir();
 	}
 
 	private static void addModFolder(Project project, Delete resetModFolder)
