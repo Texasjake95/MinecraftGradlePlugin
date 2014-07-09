@@ -7,26 +7,26 @@ import java.util.List;
 import com.texasjake95.commons.helpers.Checker;
 
 public class ExtensionATExtract {
-
+	
 	private List<ATExtractData> data = new ArrayList<ATExtractData>();
-
-	public void addAT(Object modName, File fileUnpacked)
-	{
-		if (Checker.areAllNotNull(modName, fileUnpacked))
-			this.data.add(new ATExtractData(modName.toString(), fileUnpacked));
-	}
-
+	
 	public void addAT(Object modName, String at, File fileUnpacked)
 	{
 		if (Checker.areAllNotNull(modName, at, fileUnpacked))
-			this.data.add(new ATExtractData(modName.toString(), at, fileUnpacked));
+			data.add(new ATExtractData(modName.toString(), at, fileUnpacked));
 	}
-
+	
+	public void addAT(Object modName, File fileUnpacked)
+	{
+		if (Checker.areAllNotNull(modName, fileUnpacked))
+			data.add(new ATExtractData(modName.toString(), fileUnpacked));
+	}
+	
 	public List<ATExtractData> getData()
 	{
-		return this.data;
+		return data;
 	}
-
+	
 	public void setData(List<ATExtractData> data)
 	{
 		this.data = data;

@@ -12,13 +12,6 @@ public class CCVersion {
 
 	private static final String urlFormat = "http://www.chickenbones.net/Files/notification/version.php?version=%s&file=%s";
 
-	private static String getUserVersion(Project project, String versionProp)
-	{
-		if (project.hasProperty(versionProp))
-			return (String) project.property(versionProp);
-		return null;
-	}
-
 	public static String getVersion(Project project, String mod, String versionProp)
 	{
 		String userVersion = getUserVersion(project, versionProp);
@@ -39,7 +32,9 @@ public class CCVersion {
 				if (ret == null)
 					ret = "";
 				if (!ret.startsWith("Ret: "))
+				{
 					return null;
+				}
 				String version = ret.substring(5);
 				MinecraftForgeVersion.updateVersionFile(project, versionFile, mod, version);
 				return version;
@@ -48,6 +43,7 @@ public class CCVersion {
 			{
 			}
 		if (versionFile.exists())
+		{
 			try
 			{
 				String fileVersion = MinecraftForgeVersion.getVersionFromFile(project, versionFile, mod + "Version");
@@ -57,6 +53,14 @@ public class CCVersion {
 			catch (Exception e)
 			{
 			}
+		}
 		throw new IllegalArgumentException("Unable to connect to the internet. Please specify a " + mod + " version to use (CommandLine => -P" + versionProp + "=X.X.X.X or gradle.properties => " + versionProp + "=X.X.X.X)");
+	}
+
+	private static String getUserVersion(Project project, String versionProp)
+	{
+		if (project.hasProperty(versionProp))
+			return (String) project.property(versionProp);
+		return null;
 	}
 }

@@ -19,53 +19,6 @@ public class MinecraftForgeVersion {
 
 	private static final String urlFormat = "http://files.minecraftforge.net/maven/%s/%s/promotions_slim.json";
 
-	public static String getForgeVersion(Project project)
-	{
-		return getVersion(project, "forge", "net.minecraftforge", "forge_version");
-	}
-
-	@SuppressWarnings("unchecked")
-	private static Map<String, Object> getJson(File file) throws IOException
-	{
-		Gson gson = new Gson();
-		String jsonString;
-		Map<String, Object> json;
-		if (file.exists())
-		{
-			FileInputStream fs = new FileInputStream(file);
-			jsonString = new String(ByteStreams.toByteArray(fs));
-			try
-			{
-				json = gson.fromJson(jsonString, Map.class);
-			}
-			catch (Exception e)
-			{
-				json = Maps.newHashMap();
-			}
-		}
-		else
-			json = Maps.newHashMap();
-		return json;
-	}
-
-	private static boolean getPropertyAsBoolean(Project project, String propName)
-	{
-		Object prop = project.property(propName);
-		if (prop instanceof Boolean)
-			return (boolean) prop;
-		return false;
-	}
-
-	private static String getUserForge(Project project, String mod, String versionProp)
-	{
-		if (project.hasProperty(versionProp))
-		{
-			project.getLogger().debug("Using user defined version of " + mod);
-			return (String) project.property(versionProp);
-		}
-		return null;
-	}
-
 	@SuppressWarnings("unchecked")
 	public static String getVersion(Project project, String mod, String group, String versionProp)
 	{
@@ -88,14 +41,19 @@ public class MinecraftForgeVersion {
 				String lat = promos.get(project.property("minecraft_version") + "-latest");
 				boolean useLatest = project.hasProperty("useLatest" + mod) ? getPropertyAsBoolean(project, "useLatest" + mod) : false;
 				if (rec != null && !useLatest)
+				{
 					return getWebForge(project, mod, rec, versionFile, useLatest);
+				}
 				if (lat != null)
+				{
 					return getWebForge(project, mod, lat, versionFile, useLatest);
+				}
 			}
 			catch (Exception e)
 			{
 			}
 		if (versionFile.exists())
+		{
 			try
 			{
 				String fileVersion = getVersionFromFile(project, versionFile, mod + "Version");
@@ -105,7 +63,38 @@ public class MinecraftForgeVersion {
 			catch (Exception e)
 			{
 			}
+		}
 		throw new IllegalArgumentException("Unable to connect to the internet. Please specify a " + mod + " version to use (CommandLine => -P" + versionProp + "=X.X.X.X or gradle.properties => " + versionProp + "=X.X.X.X)");
+	}
+
+	public static String getForgeVersion(Project project)
+	{
+		return getVersion(project, "forge", "net.minecraftforge", "forge_version");
+	}
+
+	private static boolean getPropertyAsBoolean(Project project, String propName)
+	{
+		Object prop = project.property(propName);
+		if (prop instanceof Boolean)
+			return (boolean) prop;
+		return false;
+	}
+
+	private static String getUserForge(Project project, String mod, String versionProp)
+	{
+		if (project.hasProperty(versionProp))
+		{
+			project.getLogger().debug("Using user defined version of " + mod);
+			return (String) project.property(versionProp);
+		}
+		return null;
+	}
+
+	private static String getWebForge(Project project, String mod, String version, File file, boolean isLatest) throws IOException
+	{
+		updateVersionFile(project, file, mod, version);
+		project.getLogger().debug(String.format("Using %s version of " + mod, isLatest ? "Latest" : "Recommended"));
+		return version;
 	}
 
 	public static final String getVersionFromFile(Project project, File file, String id) throws IOException
@@ -116,11 +105,30 @@ public class MinecraftForgeVersion {
 		return null;
 	}
 
-	private static String getWebForge(Project project, String mod, String version, File file, boolean isLatest) throws IOException
+	@SuppressWarnings("unchecked")
+	private static Map<String, Object> getJson(File file) throws IOException
 	{
-		updateVersionFile(project, file, mod, version);
-		project.getLogger().debug(String.format("Using %s version of " + mod, isLatest ? "Latest" : "Recommended"));
-		return version;
+		Gson gson = new Gson();
+		String jsonString;
+		Map<String, Object> json;
+		if (file.exists())
+		{
+			FileInputStream fs = new FileInputStream(file);
+			jsonString = new String(ByteStreams.toByteArray(fs));
+			try
+			{
+				json = gson.fromJson(jsonString, Map.class);
+			}
+			catch (Exception e)
+			{
+				json = Maps.newHashMap();
+			}
+		}
+		else
+		{
+			json = Maps.newHashMap();
+		}
+		return json;
 	}
 
 	public static void updateVersionFile(Project project, File file, String mod, String version) throws IOException

@@ -11,13 +11,13 @@ import net.minecraftforge.gradle.user.patch.UserPatchExtension;
 import com.texasjake95.commons.file.FileHelper;
 
 public class SetATs extends DefaultTask {
-
+	
 	private final File atFolder = new File(this.getProject().getBuildDir(), "/ats/");
-
+	
 	@TaskAction
 	public void doTask()
 	{
-		ArrayList<String> names = FileHelper.gatherFileNamesInDir(this.atFolder.getAbsolutePath(), true);
+		ArrayList<String> names = FileHelper.gatherFileNamesInDir(atFolder.getAbsolutePath(), true);
 		UserPatchExtension patch = (UserPatchExtension) this.getProject().getExtensions().getByName("minecraft");
 		for (String name : names)
 		{
