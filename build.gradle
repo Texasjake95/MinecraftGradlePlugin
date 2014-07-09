@@ -1,19 +1,17 @@
-buildscript
-{
-	repositories
-	{
+buildscript {
+	repositories {
 		mavenCentral()
 		mavenLocal()
-		maven
-		{
+		maven {
+			name = "sonatype"
+			url = "https://oss.sonatype.org/content/repositories/snapshots/"
+		}
+		maven {
 			name = "texasjake95Maven"
 			url = "https://github.com/Texasjake95/maven-repo/raw/master/"
 		}
 	}
-	dependencies
-	{
-		classpath 'com.texasjake95:GradlePlugin:1.1-SNAPSHOT'
-	}
+	dependencies { classpath 'com.github.texasjake95:GradlePlugin:1.2-SNAPSHOT' }
 }
 
 apply plugin: 'texasjake95'
@@ -21,29 +19,31 @@ apply plugin: 'groovy'
 
 sourceCompatibility = 1.7
 
-group= "com.texasjake95" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "MinecraftGradlePlugin"
 version = '1.0-SNAPSHOT'
 jar {
 }
 
+signing{
+	required { gradle.taskGraph.hasTask("uploadArchives") && project.hasProperty("signJars")}
+	sign configurations.archives
+}
+
 repositories {
-	maven
-	{
+	maven {
 		name = "forge"
 		url = "http://files.minecraftforge.net/maven"
 	}
-	maven
-	{
+	maven {
 		name = "sonatype"
 		url = "https://oss.sonatype.org/content/repositories/snapshots/"
 	}
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
-    compile 'com.texasjake95:GradlePlugin:1.1-SNAPSHOT'
+	compile gradleApi()
+	compile localGroovy()
+	compile 'com.github.texasjake95:GradlePlugin:1.2-SNAPSHOT'
 	compile group: "com.texasjake95", name: "Texasjake95Commons", version: "$commons_version", classifier:""
 	compile 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
 }
@@ -51,8 +51,7 @@ dependencies {
 uploadArchives {
 	dependsOn 'build'
 	repositories {
-		if(project.hasProperty("filesmaven"))
-		{
+		if(project.hasProperty("filesmaven")) {
 			mavenDeployer {
 				logger.info("Pushing to Maven Remote")
 				repository(url: project.filesmaven)
@@ -65,18 +64,18 @@ uploadArchives {
 						packaging 'jar'
 						description 'Plugin for Texasjake95\'s minecraft mod gradle scripts'
 						url 'https://github.com/Texasjake95/MinecraftGradlePlugin'
-						
+
 						scm {
 							url 'https://github.com/Texasjake95/MinecraftGradlePlugin'
 							connection 'scm:git:git://github.com/Texasjake95/MinecraftGradlePlugin.git'
 							developerConnection 'scm:git:git@github.com:Texasjake95/MinecraftGradlePlugin.git'
 						}
-						
+
 						issueManagement {
 							system 'github'
 							url 'https://github.com/Texasjake95/MinecraftGradlePlugin/issues'
 						}
-						
+
 						developers {
 							developer {
 								id 'Texasjake95'

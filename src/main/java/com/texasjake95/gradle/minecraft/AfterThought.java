@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.gradle.api.Project;
 
+import com.texasjake95.gradle.ProjectHelper;
+
 public class AfterThought {
 
 	private String name;
@@ -42,7 +44,7 @@ public class AfterThought {
 
 	public File getFile(Project project)
 	{
-		return DependencyManager.getFile(project, this.name, this.version, this.classifer);
+		return ProjectHelper.getFile(project, "afterThought", this.name, this.version, this.classifer);
 	}
 
 	public String getName()

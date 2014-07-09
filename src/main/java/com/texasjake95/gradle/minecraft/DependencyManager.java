@@ -56,28 +56,6 @@ public class DependencyManager {
 		return String.format(format, array);
 	}
 
-	public static File getFile(Project project, String depName, String version, String classifer)
-	{
-		String depFile = getFileName(depName, version, classifer);
-		if (project.getConfigurations().getNames().contains("afterThought"))
-			for (File file : project.getConfigurations().getByName("afterThought").resolve())
-			{
-				String fileName = file.getName();
-				if (fileName.contains("sources") || fileName.contains("javadoc"))
-					continue;
-				if (fileName.contains(depFile))
-					return file;
-			}
-		return null;
-	}
-
-	private static String getFileName(String artifact, String version, String classifer)
-	{
-		String format = classifer == null ? "%s-%s" : "%s-%s-%s";
-		Object[] array = classifer == null ? new Object[] { artifact, version } : new Object[] { artifact, version, classifer };
-		return String.format(format, array);
-	}
-
 	private Project project;
 	private ArrayList<AfterThought> afterThoughts = Lists.newArrayList();
 
