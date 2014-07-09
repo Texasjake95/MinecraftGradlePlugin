@@ -18,24 +18,24 @@ public class DependencyManager {
 		ProjectHelper.addDependency(project, "afterThought", dep);
 	}
 
-	private static void addChickenBonesMod(Project project, DependencyManager manager, String mod, String versionProp)
+	private static void addChickenBonesMod(Project project, DependencyManager manager, String mod, String versionProp, String config, boolean modFolder)
 	{
 		String version = project.property("minecraft_version") + "-" + CCVersion.getVersion(project, mod, versionProp);
-		ProjectHelper.addDependency(project, "compile", getDepString("codechicken", mod, version, "dev"));
-		ProjectHelper.addDependency(project, "compile", getDepString("codechicken", mod, version, "src"));
+		ProjectHelper.addDependency(project, config, getDepString("codechicken", mod, version, "dev"));
+		ProjectHelper.addDependency(project, config, getDepString("codechicken", mod, version, "src"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "dev"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "src"));
-		manager.afterThoughts.add(new AfterThought(mod, version, "dev", "src"));
+		manager.afterThoughts.add(new AfterThought(mod, version, "dev", "src").setModFolder(modFolder));
 	}
 
-	private static void addChickenBonesModWithAT(Project project, DependencyManager manager, String mod, String versionProp, String atName, String unpackedDir)
+	private static void addChickenBonesModWithAT(Project project, DependencyManager manager, String mod, String versionProp, String atName, String unpackedDir, String config, boolean modFolder)
 	{
 		String version = project.property("minecraft_version") + "-" + CCVersion.getVersion(project, mod, versionProp);
-		ProjectHelper.addDependency(project, "compile", getDepString("codechicken", mod, version, "dev"));
-		ProjectHelper.addDependency(project, "compile", getDepString("codechicken", mod, version, "src"));
+		ProjectHelper.addDependency(project, config, getDepString("codechicken", mod, version, "dev"));
+		ProjectHelper.addDependency(project, config, getDepString("codechicken", mod, version, "src"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "dev"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "src"));
-		manager.afterThoughts.add(new AfterThought(mod, version, "dev", "src", "nei_at.cfg", "NEI"));
+		manager.afterThoughts.add(new AfterThought(mod, version, "dev", "src", "nei_at.cfg", "NEI").setModFolder(modFolder));
 	}
 
 	private static boolean checkForDep(Project project, String group, String artifact, String version)
@@ -64,43 +64,43 @@ public class DependencyManager {
 		this.project = project;
 	}
 
-	public void addCCC()
+	public void addCCC(String config)
 	{
 		String version = MinecraftForgeVersion.getVersion(this.project, "CodeChickenLib", "codechicken", "ccl_version");
 		version = this.project.property("minecraft_version") + "-" + version;
 		if (!checkForDep(this.project, "codechicken", "CodeChickenLib", version))
-			this.addCCL();
-		addChickenBonesMod(this.project, this, "CodeChickenCore", "ccc_version");
+			this.addCCL(config, true);
+		addChickenBonesMod(this.project, this, "CodeChickenCore", "ccc_version", config, true);
 	}
 
-	public void addCCL()
+	public void addCCL(String config, boolean modFolder)
 	{
 		String version = MinecraftForgeVersion.getVersion(this.project, "CodeChickenLib", "codechicken", "ccl_version");
 		version = this.project.property("minecraft_version") + "-" + version;
-		ProjectHelper.addDependency(this.project, "compile", getDepString("codechicken", "CodeChickenLib", version, "dev"));
-		ProjectHelper.addDependency(this.project, "compile", getDepString("codechicken", "CodeChickenLib", version, "src"));
+		ProjectHelper.addDependency(this.project, config, getDepString("codechicken", "CodeChickenLib", version, "dev"));
+		ProjectHelper.addDependency(this.project, config, getDepString("codechicken", "CodeChickenLib", version, "src"));
 		addAfterThoughtDep(this.project, getDepString("codechicken", "CodeChickenLib", version, "dev"));
 		addAfterThoughtDep(this.project, getDepString("codechicken", "CodeChickenLib", version, "src"));
-		this.afterThoughts.add(new AfterThought("CodeChickenLib", version, "dev", "src"));
+		this.afterThoughts.add(new AfterThought("CodeChickenLib", version, "dev", "src").setModFolder(modFolder));
 	}
 
-	public void addIronChests()
+	public void addIronChests(String config, boolean modFolder)
 	{
 		String version = MinecraftForgeVersion.getVersion(this.project, "ironchest", "cpw.mods", "ironchest_version");
 		version = this.project.property("minecraft_version") + "-" + version;
-		ProjectHelper.addDependency(this.project, "runtime", getDepString("cpw.mods", "ironchest", version, "deobf"));
-		ProjectHelper.addDependency(this.project, "runtime", getDepString("cpw.mods", "ironchest", version, "src"));
+		ProjectHelper.addDependency(this.project, config, getDepString("cpw.mods", "ironchest", version, "deobf"));
+		ProjectHelper.addDependency(this.project, config, getDepString("cpw.mods", "ironchest", version, "src"));
 		addAfterThoughtDep(this.project, getDepString("cpw.mods", "ironchest", version, "deobf"));
 		addAfterThoughtDep(this.project, getDepString("cpw.mods", "ironchest", version, "src"));
-		this.afterThoughts.add(new AfterThought("ironchest", version, "deobf", "src").setModFolder(false));
+		this.afterThoughts.add(new AfterThought("ironchest", version, "deobf", "src").setModFolder(modFolder));
 	}
 
-	public void addNEI()
+	public void addNEI(String config)
 	{
 		String version = this.project.property("minecraft_version") + "-" + CCVersion.getVersion(this.project, "CodeChickenCore", "ccc_version");
 		if (!checkForDep(this.project, "codechicken", "CodeChickenCore", version))
-			this.addCCC();
-		addChickenBonesModWithAT(this.project, this, "NotEnoughItems", "nei_version", "nei_at.cfg", "NEI");
+			this.addCCC(config);
+		addChickenBonesModWithAT(this.project, this, "NotEnoughItems", "nei_version", "nei_at.cfg", "NEI", config, true);
 	}
 
 	public void handleAfterThought()
