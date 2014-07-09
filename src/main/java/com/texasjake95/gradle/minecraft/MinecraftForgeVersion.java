@@ -12,6 +12,7 @@ import org.gradle.api.Project;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import com.texasjake95.commons.file.FileOutput;
 
@@ -125,7 +126,7 @@ public class MinecraftForgeVersion {
 
 	public static void updateVersionFile(Project project, File file, String mod, String version) throws IOException
 	{
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String jsonString;
 		Map<String, Object> json = getJson(file);
 		json.put(mod + "Version", version);

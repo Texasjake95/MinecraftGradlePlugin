@@ -24,11 +24,6 @@ version = '1.0-SNAPSHOT'
 jar {
 }
 
-signing{
-	required { (gradle.taskGraph.hasTask("uploadArchives") && project.hasProperty("signJars")) }
-	sign configurations.archives
-}
-
 repositories {
 	maven {
 		name = "forge"
