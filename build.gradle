@@ -25,7 +25,7 @@ jar {
 }
 
 signing{
-	required { gradle.taskGraph.hasTask("uploadArchives") && project.hasProperty("signJars")}
+	required { (gradle.taskGraph.hasTask("uploadArchives") && project.hasProperty("signJars")) }
 	sign configurations.archives
 }
 
