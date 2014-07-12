@@ -22,7 +22,7 @@ public class DependencyManager {
 	{
 		String version = project.property("minecraft_version") + "-" + CCVersion.getVersion(project, mod, versionProp);
 		ProjectHelper.addDependency(project, config, getDepString("codechicken", mod, version, "dev"));
-		ProjectHelper.addDependency(project, config, getDepString("codechicken", mod, version, "src"));
+		ProjectHelper.addDependency(project, "sources", getDepString("codechicken", mod, version, "src"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "dev"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "src"));
 		manager.afterThoughts.add(new AfterThought(mod, version, "dev", "src").setModFolder(modFolder));
@@ -32,7 +32,7 @@ public class DependencyManager {
 	{
 		String version = project.property("minecraft_version") + "-" + CCVersion.getVersion(project, mod, versionProp);
 		ProjectHelper.addDependency(project, config, getDepString("codechicken", mod, version, "dev"));
-		ProjectHelper.addDependency(project, config, getDepString("codechicken", mod, version, "src"));
+		ProjectHelper.addDependency(project, "sources", getDepString("codechicken", mod, version, "src"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "dev"));
 		addAfterThoughtDep(project, getDepString("codechicken", mod, version, "src"));
 		manager.afterThoughts.add(new AfterThought(mod, version, "dev", "src", "nei_at.cfg", "NEI").setModFolder(modFolder));
@@ -78,7 +78,7 @@ public class DependencyManager {
 		String version = MinecraftForgeVersion.getVersion(this.project, "CodeChickenLib", "codechicken", "ccl_version");
 		version = this.project.property("minecraft_version") + "-" + version;
 		ProjectHelper.addDependency(this.project, config, getDepString("codechicken", "CodeChickenLib", version, "dev"));
-		ProjectHelper.addDependency(this.project, config, getDepString("codechicken", "CodeChickenLib", version, "src"));
+		ProjectHelper.addDependency(this.project, "sources", getDepString("codechicken", "CodeChickenLib", version, "src"));
 		addAfterThoughtDep(this.project, getDepString("codechicken", "CodeChickenLib", version, "dev"));
 		addAfterThoughtDep(this.project, getDepString("codechicken", "CodeChickenLib", version, "src"));
 		this.afterThoughts.add(new AfterThought("CodeChickenLib", version, "dev", "src").setModFolder(modFolder));
@@ -89,7 +89,7 @@ public class DependencyManager {
 		String version = MinecraftForgeVersion.getVersion(this.project, "ironchest", "cpw.mods", "ironchest_version");
 		version = this.project.property("minecraft_version") + "-" + version;
 		ProjectHelper.addDependency(this.project, config, getDepString("cpw.mods", "ironchest", version, "deobf"));
-		ProjectHelper.addDependency(this.project, config, getDepString("cpw.mods", "ironchest", version, "src"));
+		ProjectHelper.addDependency(this.project, "sources", getDepString("cpw.mods", "ironchest", version, "src"));
 		addAfterThoughtDep(this.project, getDepString("cpw.mods", "ironchest", version, "deobf"));
 		addAfterThoughtDep(this.project, getDepString("cpw.mods", "ironchest", version, "src"));
 		this.afterThoughts.add(new AfterThought("ironchest", version, "deobf", "src").setModFolder(modFolder));
