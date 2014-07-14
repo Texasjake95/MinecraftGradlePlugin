@@ -1,4 +1,4 @@
-package com.texasjake95.gradle.minecraft;
+package com.texasjake95.gradle.minecraft.extension;
 
 import java.util.HashSet;
 

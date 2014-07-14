@@ -1,4 +1,4 @@
-package com.texasjake95.gradle.minecraft;
+package com.texasjake95.gradle.minecraft.extension;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +10,9 @@ import com.google.common.collect.Lists;
 
 import com.texasjake95.gradle.ExtensionEclipseSetup;
 import com.texasjake95.gradle.ProjectHelper;
+import com.texasjake95.gradle.minecraft.extension.data.AfterThought;
+import com.texasjake95.gradle.minecraft.version.CCVersion;
+import com.texasjake95.gradle.minecraft.version.MinecraftForgeVersion;
 
 public class DependencyManager {
 

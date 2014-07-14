@@ -1,4 +1,4 @@
-package com.texasjake95.gradle.minecraft;
+package com.texasjake95.gradle.minecraft.extension.data;
 
 public class ModFolderData {
 

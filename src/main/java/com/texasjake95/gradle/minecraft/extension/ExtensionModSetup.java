@@ -1,7 +1,9 @@
-package com.texasjake95.gradle.minecraft;
+package com.texasjake95.gradle.minecraft.extension;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.texasjake95.gradle.minecraft.extension.data.ModFolderData;
 
 public class ExtensionModSetup {
 

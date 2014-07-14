@@ -10,47 +10,29 @@ import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.TaskCollection;
-import org.gradle.api.tasks.bundling.Jar;
 
 import com.google.common.base.Strings;
 
 import net.minecraftforge.gradle.common.BaseExtension;
-import net.minecraftforge.gradle.tasks.user.SourceCopyTask;
 
 import com.texasjake95.gradle.ProjectHelper;
+import com.texasjake95.gradle.minecraft.extension.DependencyManager;
+import com.texasjake95.gradle.minecraft.extension.ExtensionATExtract;
+import com.texasjake95.gradle.minecraft.extension.ExtensionConfigurationSkip;
+import com.texasjake95.gradle.minecraft.extension.ExtensionJarData;
+import com.texasjake95.gradle.minecraft.extension.ExtensionModSetup;
+import com.texasjake95.gradle.minecraft.extension.data.ATExtract;
+import com.texasjake95.gradle.minecraft.extension.data.ATExtractData;
+import com.texasjake95.gradle.minecraft.extension.data.ModFolderData;
+import com.texasjake95.gradle.minecraft.version.Version;
 
 public class JavaProxy {
 
 	public static boolean setup = true;
 	private static final Pattern VERSION_CHECK = Pattern.compile("([\\d._pre]+)-([\\w\\d.]+)(?:-[\\w\\d.]+)?");
-
-	private static void addJarTasks(Project project)
-	{
-		SourceCopyTask task = (SourceCopyTask) project.getTasks().getByName("sourceMainJava");
-		task.replace("${version}", project.property("mod_version").toString() + "." + project.property("buildNumber").toString());
-		JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");
-		//
-		Jar jar = ProjectHelper.addTask(project, "devJar", Jar.class);
-		jar.setClassifier("dev");
-		jar.from(javaConv.getSourceSets().getByName("main").getOutput());
-		jar.from(task.getOutput());
-		project.getArtifacts().add("archives", jar);
-		project.getTasks().getByName("build").dependsOn(jar.getName());
-		//
-		jar = ProjectHelper.addTask(project, "apiJar", Jar.class);
-		jar.setClassifier("api");
-		jar.from(javaConv.getSourceSets().getByName("main").getOutput()).include("com/texasjake95/*/api/**");
-		jar.from(task.getOutput()).include("com/texasjake95/*/api/**");
-		project.getArtifacts().add("archives", jar);
-		project.getTasks().getByName("build").dependsOn(jar.getName());
-		//
-		jar = (Jar) project.getTasks().getByName("sourceJar");
-		jar.from(task.getOutput());
-	}
 
 	private static void addModFolder(Project project, Delete resetModFolder)
 	{
@@ -93,6 +75,7 @@ public class JavaProxy {
 		project.getExtensions().create("modSetup", ExtensionModSetup.class);
 		project.getExtensions().create("skipConfiguration", ExtensionConfigurationSkip.class);
 		project.getExtensions().create("depAdd", DependencyManager.class, project);
+		project.getExtensions().create("jarData", ExtensionJarData.class);
 		project.afterEvaluate(new Action<Project>() {
 
 			@Override
@@ -114,7 +97,7 @@ public class JavaProxy {
 					setATs.dependsOn(tasks.getNames());
 					if (checkModFolder((ExtensionModSetup) project.getExtensions().getByName("modSetup")))
 						addModFolder(project, resetModFolder);
-					addJarTasks(project);
+					JarHelper.addJarTasks(project);
 				}
 				setup = false;
 			}
@@ -167,7 +150,7 @@ public class JavaProxy {
 	{
 		BaseExtension patch = (BaseExtension) project.getExtensions().getByName("minecraft");
 		if (Strings.isNullOrEmpty(patch.getVersion()) || patch.getVersion().equals("null") || !VERSION_CHECK.matcher(patch.getVersion()).matches())
-			patch.setVersion(project.property("minecraft_version") + "-" + MinecraftForgeVersion.getForgeVersion(project));
+			patch.setVersion(project.property("minecraft_version") + "-" + Version.getForgeVersion(project));
 		if (new File("../run").exists())
 			patch.setRunDir("../run/assets");
 	}

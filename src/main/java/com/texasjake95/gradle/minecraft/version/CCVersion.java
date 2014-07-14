@@ -1,4 +1,4 @@
-package com.texasjake95.gradle.minecraft;
+package com.texasjake95.gradle.minecraft.version;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,7 +41,7 @@ public class CCVersion {
 				if (!ret.startsWith("Ret: "))
 					return null;
 				String version = ret.substring(5);
-				MinecraftForgeVersion.updateVersionFile(project, versionFile, mod, version);
+				Version.updateVersionFile(project, versionFile, mod, version);
 				return version;
 			}
 			catch (Exception e)
@@ -50,7 +50,7 @@ public class CCVersion {
 		if (versionFile.exists())
 			try
 			{
-				String fileVersion = MinecraftForgeVersion.getVersionFromFile(project, versionFile, mod + "Version");
+				String fileVersion = Version.getVersionFromFile(project, versionFile, mod + "Version");
 				if (fileVersion != null)
 					return fileVersion;
 			}

@@ -1,4 +1,4 @@
-package com.texasjake95.gradle.minecraft;
+package com.texasjake95.gradle.minecraft.extension.data;
 
 import java.io.File;
 
@@ -9,14 +9,14 @@ public class ATExtractData {
 	private File fileUnpacked;
 	private String taskName;
 
-	ATExtractData(String modFile, File fileUnpacked)
+	public ATExtractData(String modFile, File fileUnpacked)
 	{
 		this.modFile = modFile;
 		this.fileUnpacked = fileUnpacked;
 		this.taskName = modFile.substring(0, modFile.indexOf("-")) + "AT";
 	}
 
-	ATExtractData(String modFile, String at, File fileUnpacked)
+	public ATExtractData(String modFile, String at, File fileUnpacked)
 	{
 		this.modFile = modFile;
 		this.at = at;
