@@ -15,7 +15,6 @@ buildscript {
 }
 
 apply plugin: 'texasjake95'
-apply plugin: 'groovy'
 
 sourceCompatibility = 1.7
 

@@ -27,7 +27,7 @@ public class MinecraftForgeVersion {
 	{
 		if (project.hasProperty(versionProp))
 		{
-			project.getLogger().debug("Using user defined version of " + mod);
+			project.getLogger().info("Using user defined version of " + mod);
 			return (String) project.property(versionProp);
 		}
 		return null;
@@ -36,7 +36,7 @@ public class MinecraftForgeVersion {
 	@SuppressWarnings("unchecked")
 	public static String getVersion(Project project, String mod, String group, String versionProp)
 	{
-		project.getLogger().debug("Attempting to get " + mod + " version");
+		project.getLogger().info("Attempting to get " + mod + " version");
 		String version = getUserForge(project, mod, versionProp);
 		if (version != null)
 			return version;
@@ -78,7 +78,7 @@ public class MinecraftForgeVersion {
 	private static String getWebForge(Project project, String mod, String version, File file, boolean isLatest) throws IOException
 	{
 		Version.updateVersionFile(project, file, mod, version);
-		project.getLogger().debug(String.format("Using %s version of " + mod, isLatest ? "Latest" : "Recommended"));
+		project.getLogger().info(String.format("Using %s version of " + mod, isLatest ? "Latest" : "Recommended"));
 		return version;
 	}
 }

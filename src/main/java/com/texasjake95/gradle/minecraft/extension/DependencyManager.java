@@ -118,7 +118,7 @@ public class DependencyManager {
 			{
 				if (afterThought.copyToModFolder())
 					modSetup.addMod(file);
-				eclipseSetup.addEclipseSetup(afterThought.getName() + "-" + afterThought.getVersion(), afterThought.getClassifer(), afterThought.getSoruceClassifer());
+				eclipseSetup.addEclipseSetup(afterThought.getName() + "-" + afterThought.getVersion(), afterThought.getClassifer(), afterThought.getSoruceClassifer(), "afterThought", "afterThought");
 				if (afterThought.hasAT())
 					atSetup.addAT(file, afterThought.getAtName(), new File(this.project.getBuildDir().getAbsolutePath() + "/unpacked/" + afterThought.getUnPackDir() + "/"));
 			}

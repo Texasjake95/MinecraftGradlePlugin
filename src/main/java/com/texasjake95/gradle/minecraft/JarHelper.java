@@ -23,7 +23,6 @@ public class JarHelper {
 
 	public static void addJarTasks(Project project)
 	{
-		//
 		SourceCopyTask task = (SourceCopyTask) project.getTasks().getByName("sourceMainJava");
 		task.replace("${version}", project.property("mod_version").toString() + "." + project.property("buildNumber").toString());
 		JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");

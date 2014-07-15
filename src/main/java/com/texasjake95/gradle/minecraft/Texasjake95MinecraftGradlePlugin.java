@@ -7,6 +7,7 @@ import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
 import org.gradle.api.Action;
+import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Dependency;
@@ -29,7 +30,7 @@ import com.texasjake95.gradle.minecraft.extension.data.ATExtractData;
 import com.texasjake95.gradle.minecraft.extension.data.ModFolderData;
 import com.texasjake95.gradle.minecraft.version.Version;
 
-public class JavaProxy {
+public class Texasjake95MinecraftGradlePlugin implements Plugin<Project> {
 
 	public static boolean setup = true;
 	private static final Pattern VERSION_CHECK = Pattern.compile("([\\d._pre]+)-([\\w\\d.]+)(?:-[\\w\\d.]+)?");
@@ -62,7 +63,8 @@ public class JavaProxy {
 		task.dependsOn(resetModFolder.getName());
 	}
 
-	public static void apply(Project project)
+	@Override
+	public void apply(Project project)
 	{
 		project.getConfigurations().create("afterThought");
 		project.getConfigurations().create("sources");
